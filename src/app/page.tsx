@@ -4,8 +4,7 @@ import Link from "next/link";
 import Product from "@/app/components/Product";
 import React, { useEffect } from "react";
 import getData from "@/lib/products";
-import { ProductProps } from "@/types/product";
-import { IntervalHistogram } from "perf_hooks";
+import type { ProductProps } from "@/types/product";
 
 
 export default function Home() {
@@ -19,7 +18,6 @@ export default function Home() {
 
     //render products with pagination
     const renderProducts = () => {
-
         const start = (page - 1) * limit;
         const end = page * limit;
         let paginatedProducts = products.slice(start, end);
@@ -30,7 +28,6 @@ export default function Home() {
                 return product.name.toLowerCase().includes(search.toLowerCase())
             })
         }
-
 
         return paginatedProducts.map((product: any, index: number) => (
             <li className={'flex-shrink h-auto'} key={product.id}>
@@ -67,8 +64,6 @@ export default function Home() {
     const handleSearch = (e: any) => {
         clearTimeout(typingTimer);
         typingTimer = setTimeout(() => setSearch(e.target.value), doneTypingInterval);
-
-
     }
 
     useEffect(() => {
