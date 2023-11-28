@@ -5,19 +5,32 @@ import Product from "@/app/components/Product";
 import React, { useEffect } from "react";
 import getData from "@/lib/products";
 import { ProductProps } from "@/types/product";
+import { IntervalHistogram } from "perf_hooks";
 
 
 export default function Home() {
     const [products, setProducts] = React.useState<ProductProps[]>([])
     const [page, setPage] = React.useState<number>(1)
     const [limit, setLimit] = React.useState<number>(10)
+    const [search, setSearch] = React.useState<string>('')
+
+    let typingTimer : NodeJS.Timeout;
+    let doneTypingInterval: number = 500;
 
     //render products with pagination
     const renderProducts = () => {
 
         const start = (page - 1) * limit;
         const end = page * limit;
-        const paginatedProducts = products.slice(start, end);
+        let paginatedProducts = products.slice(start, end);
+
+        //search products by name or category substring
+        if (search.length) {
+            paginatedProducts = paginatedProducts.filter((product: any) => {
+                return product.name.toLowerCase().includes(search.toLowerCase())
+            })
+        }
+
 
         return paginatedProducts.map((product: any, index: number) => (
             <li className={'flex-shrink h-auto'} key={product.id}>
@@ -51,6 +64,13 @@ export default function Home() {
         ))
     }
 
+    const handleSearch = (e: any) => {
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(() => setSearch(e.target.value), doneTypingInterval);
+
+
+    }
+
     useEffect(() => {
         if (products.length) return
         console.log('fetching data')
@@ -68,8 +88,11 @@ export default function Home() {
 
     return (
         <div className={'flex flex-col h-full min-h-screen w-screen md:h-full m-0 p-5 justify-between items-center'}>
+            <div className={'flex justify-center items-center h-24'}>
+                <input onInput={handleSearch} type="text" placeholder="Search" className="input input-bordered input-primary w-full max-w-xs" />
+            </div>
             <div className={'flex'}>
-                <ul className={'flex h-full w-screen m-0 gap-1 flex-wrap justify-center items-center'}>
+                <ul className={'flex h-full w-screen m-0 gap-1 flex-wrap justify-start items-center'}>
                     {renderProducts()}
                 </ul>
             </div>
